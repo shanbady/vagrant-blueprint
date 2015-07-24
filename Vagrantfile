@@ -3,7 +3,37 @@
 
 
 $bootstrap = <<BOOTSTRAP
+  sudo -s -H
+  sudo apt-get update -y
+  sudo apt-get install -y build-essential
+  sudo apt-get install -y aria2 --no-install-recommends
+  sudo wget https://raw.githubusercontent.com/ilikenwf/apt-fast/master/apt-fast
+  sudo wget https://raw.githubusercontent.com/ilikenwf/apt-fast/master/apt-fast.conf
+  sudo cp apt-fast /usr/bin/
+  sudo chmod +x /usr/bin/apt-fast
+  sudo cp apt-fast.conf /etc
+  sudo apt-get install -y cachefilesd
+  sudo echo "RUN=yes" > /etc/default/cachefilesd
+  sudo apt-get install nfs-common portmap
+  sudo apt-fast -y install git openssh-server li
+  sudo apt-fast -y install git openssh-server libfreetype6-dev pkg-config
+  sudo ssh-keyscan ssh-keygen -t rsa  -H github.com >> ~/.ssh/known_hosts
+  sudo chmod 700 ~/.ssh
+  # enable ssh agent forwarding
+  sudo touch /etc/sudoers.d/root_ssh_agent
+  sudo chmod 0440 /etc/sudoers.d/root_ssh_agent
+  sudo echo "Defaults    env_keep += \"SSH_AUTH_SOCK\"" > /etc/sudoers.d/root_ssh_agent
+  if [ -z "$SSH_AUTH_SOCK" ]; then
+    echo "ssh agent not forwarded, aborting" >&2
+    exit 1
+  fi
+  # make these known hosts to ssh
+  sudo ssh -T git@bitbucket.org -o StrictHostKeyChecking=no
+  sudo ssh -T git@github.com -o StrictHostKeyChecking=no
+  sudo sed -i  '/requiretty/s/^/#/'  /etc/sudoers
+  
   echo "your initialization shell scripts go here"
+
 BOOTSTRAP
 
 
